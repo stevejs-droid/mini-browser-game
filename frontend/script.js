@@ -9,9 +9,11 @@ const timeDisplay = document.getElementById("time");
 
 document.getElementById("startBtn").onclick = startGame;
 
+// Start game
 function startGame() {
     score = 0;
     timeLeft = 30;
+
     scoreDisplay.textContent = score;
     timeDisplay.textContent = timeLeft;
 
@@ -19,6 +21,7 @@ function startGame() {
     timerInterval = setInterval(updateTimer, 1000);
 }
 
+// Spawn target
 function spawnTarget() {
     gameArea.innerHTML = "";
 
@@ -37,6 +40,7 @@ function spawnTarget() {
     gameArea.appendChild(target);
 }
 
+// Timer
 function updateTimer() {
     timeLeft--;
     timeDisplay.textContent = timeLeft;
@@ -49,31 +53,39 @@ function updateTimer() {
     }
 }
 
-// Send score to backend
+// ✅ Save score using localStorage
 function submitScore() {
     const name = prompt("Enter your name:");
 
-    fetch("http://localhost:3000/score", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ name, score })
-    }).then(loadLeaderboard);
+    if (!name) return;
+
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+    scores.push({ name, score });
+
+    localStorage.setItem("scores", JSON.stringify(scores));
+
+    loadLeaderboard();
 }
 
-// Load leaderboard
+// ✅ Load leaderboard
 function loadLeaderboard() {
-    fetch("http://localhost:3000/leaderboard")
-        .then(res => res.json())
-        .then(data => {
-            const list = document.getElementById("leaderboard");
-            list.innerHTML = "";
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
-            data.forEach(player => {
-                const li = document.createElement("li");
-                li.textContent = `${player.name}: ${player.score}`;
-                list.appendChild(li);
-            });
-        });
+    // Sort descending
+    scores.sort((a, b) => b.score - a.score);
+
+    const list = document.getElementById("leaderboard");
+    list.innerHTML = "";
+
+    scores.slice(0, 10).forEach((player, index) => {
+        const li = document.createElement("li");
+
+        // Add ranking number
+        li.textContent = `${index + 1}. ${player.name}: ${player.score}`;
+
+        list.appendChild(li);
+    });
 }
 
 // Load leaderboard on page load
