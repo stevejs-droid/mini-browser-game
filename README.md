@@ -12,5 +12,9 @@ A browser-based reflex game with leaderboard using Node.js.
 HTML, CSS, JavaScript, Node.js
 
 ## How to Run
-npm install
-node server.js
+
+1. Install Node.js
+2. Run:
+   npm install
+   node server.js
+3. Open frontend/index.html
